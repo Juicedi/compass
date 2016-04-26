@@ -4,17 +4,19 @@
     var database = {
         start: {},
         end: {}
-    }
+    };
 
     // gets starting location coordinates
     function getStartLocation(whichButton) {
+        var yourLocation = {};
+        
         if (whichButton === 1) {
-            var yourLocation = {
+            yourLocation = {
                 lat: 60.2182261,
                 lng: 24.811528
             };
         } else if (whichButton === 2) {
-            var yourLocation = {
+            yourLocation = {
                 lat: 31.2246325,
                 lng: 121.1965702,
             };
@@ -24,7 +26,6 @@
 
     // gets location coordinates by httpRequest from google geoCode API
     function getEndLocation(callback) {
-        console.log('api coordinates requested');
         var apiRequest = 'https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDUTG34LGXSXBAY-trPXT6z3F_g1h05iYk&address=helsinki';
         var httpRequest = new XMLHttpRequest();
         // when the request is loaded
@@ -51,7 +52,7 @@
 
         var division = latDifference / lngDifference;
         var rad2deg = 180 / Math.PI;
-        var degrees = Math.atan(division) * rad2deg
+        var degrees = Math.atan(division) * rad2deg;
         
         if (endCoordinates.lng < startCoordinates.lng) {
             degrees = degrees + 180;
@@ -65,7 +66,7 @@
 
     // shows results in html
     function showCompass(degrees) {
-        console.log(degrees);
+        // console.log(degrees);
         $('#arrow').rotate(degrees);
     }
 
