@@ -1,3 +1,6 @@
+/** reittiä varten
+* https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDUTG34LGXSXBAY-trPXT6z3F_g1h05iYk&origin=60.2182261,24.81152&destination=60.1711124,24.9417507&mode=walking
+*/
 (function () {
     'use strict';
 
@@ -9,7 +12,7 @@
     // gets starting location coordinates
     function getStartLocation(whichButton) {
         var yourLocation = {};
-        
+
         if (whichButton === 1) {
             yourLocation = {
                 lat: 60.2182261,
@@ -40,8 +43,8 @@
     }
 
     /**
-     * when the request is ready
-     * this will handle the data
+     * When the request is ready,
+     * this will handle the data and show in what direction is the end point
      */
     function getDirection() {
         var endCoordinates = database.end;
@@ -53,14 +56,14 @@
         var division = latDifference / lngDifference;
         var rad2deg = 180 / Math.PI;
         var degrees = Math.atan(division) * rad2deg;
-        
+
         if (endCoordinates.lng < startCoordinates.lng) {
             degrees = degrees + 180;
         }
 
         // invert the degrees, so positive degrees grow counter clockwise
         degrees = degrees - degrees * 2;
-        
+
         showCompass(degrees);
     }
 
@@ -81,6 +84,38 @@
             getDirection();
         });
     }
-    
+
+    function calculateDistance() {
+        
+        var lat1 = 60.2182348;
+        var lon1 = 24.8107336;
+        
+        var lat2 = 60.2176518;
+        var lon2 = 24.8106959;
+        
+        // Converts numeric degrees to radians
+        if (typeof (Number.prototype.toRad) === "undefined") {
+            Number.prototype.toRad = function () {
+                return this * Math.PI / 180;
+            }
+        }
+        
+        //The haversine formula calculates the distance between two coordinates 
+        var R = 6371000; // km 
+        //has a problem with the .toRad() method below.
+        var x1 = lat2 - lat1;
+        var dLat = x1.toRad();
+        var x2 = lon2 - lon1;
+        var dLon = x2.toRad();
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+
+        console.log(d + 'm');
+    }
+    calculateDistance();
+
     getEndLocation(initButtons);
 })();
