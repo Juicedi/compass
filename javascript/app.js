@@ -1,6 +1,6 @@
 /** reittiä varten
-* https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDUTG34LGXSXBAY-trPXT6z3F_g1h05iYk&origin=60.2182261,24.81152&destination=60.1711124,24.9417507&mode=walking
-*/
+ * https://maps.googleapis.com/maps/api/directions/json?key=AIzaSyDUTG34LGXSXBAY-trPXT6z3F_g1h05iYk&origin=60.2182261,24.81152&destination=60.1711124,24.9417507&mode=walking
+ */
 (function () {
     'use strict';
 
@@ -9,32 +9,41 @@
         end: {}
     };
 
-    // gets starting location coordinates
-    function getStartLocation(whichButton) {
-        var yourLocation = {};
+    function updateStartLocation(position) {
+        console.log(position.coords);
 
-        if (whichButton === 1) {
-            yourLocation = {
-                lat: 60.2182261,
-                lng: 24.811528
-            };
-        } else if (whichButton === 2) {
-            yourLocation = {
-                lat: 31.2246325,
-                lng: 121.1965702,
-            };
-        }
-        database.start = yourLocation;
-    }
-
-    // gets location coordinates by httpRequest from google geoCode API
-    function getEndLocation(callback) {
-        var apiRequest = 'https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDUTG34LGXSXBAY-trPXT6z3F_g1h05iYk&address=helsinki';
+        var apiRequest = 'https://nodejs-jussilat.rhcloud.com/updateLocation?name=kayttaja&lat=' + position.coords.latitude + '&lng=' + position.coords.longitude;
         var httpRequest = new XMLHttpRequest();
         // when the request is loaded
         httpRequest.onload = function () {
             // we're calling our method
-            var response = JSON.parse(httpRequest.response).results[0].geometry.location;
+            var response = JSON.parse(httpRequest.response);
+        };
+        httpRequest.open('GET', apiRequest);
+        httpRequest.send();
+    }
+
+    // gets starting location coordinates
+    function getStartLocation() {
+        var x = document.getElementById("demo");
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(updateStartLocation);
+        } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+        }
+        //http: //nodejs-jussilat.rhcloud.com/updateLocation?name=kayttaja&lat=61&lng=25 https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDUTG34LGXSXBAY-trPXT6z3F_g1h05iYk&address=helsinki
+
+    }
+
+    // gets location coordinates by httpRequest from google geoCode API
+    function getEndLocation(callback) {
+        
+        var apiRequest = 'https://nodejs-jussilat.rhcloud.com/getLocations';
+        var httpRequest = new XMLHttpRequest();
+        // when the request is loaded
+        httpRequest.onload = function () {
+            // we're calling our method
+            var response = JSON.parse(httpRequest.response);
             database.end = response;
             callback();
         };
@@ -76,33 +85,34 @@
     function initButtons() {
         $('.hidden').removeClass('hidden');
         $('#sello').on('click', function () {
-            getStartLocation(1);
+            console.log(database.end);
+            getStartLocation();
             getDirection();
         });
         $('#shanghai').on('click', function () {
-            getStartLocation(2);
+            getStartLocation();
             getDirection();
         });
     }
 
     function calculateDistance() {
-        
+
         var lat1 = 60.2182348;
         var lon1 = 24.8107336;
-        
+
         var lat2 = 60.2176518;
         var lon2 = 24.8106959;
-        
+
         // Converts numeric degrees to radians
         if (typeof (Number.prototype.toRad) === "undefined") {
             Number.prototype.toRad = function () {
                 return this * Math.PI / 180;
-            }
+            };
         }
-        
-        //The haversine formula calculates the distance between two coordinates 
+
+        // The haversine formula calculates the distance between two coordinates 
         var R = 6371000; // km 
-        //has a problem with the .toRad() method below.
+        // has a problem with the .toRad() method below.
         var x1 = lat2 - lat1;
         var dLat = x1.toRad();
         var x2 = lon2 - lon1;
